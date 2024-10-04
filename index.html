@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Div Splitter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #spinnerContainer {
+            height: 40px;
+            background-color: lightgray;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #spinner {
+            width: 50px;
+        }
+
+        #workArea {
+            background-color: aqua;
+            border-style: solid;
+
+
+            /* flex: 1;
+            background-color: #f0f0f0;
+            position: relative;
+            width:800px;
+            height:600px; */
+        }
+
+        .splitter {
+            background-color: #999;
+            position: absolute;
+            z-index: 10;
+            cursor: ew-resize;
+        }
+
+        .vertical-splitter {
+            width: 100%;
+            height: 15px;
+            cursor: ns-resize;
+        }
+
+        .horizontal-splitter {
+            width: 15px;
+            height: 100%;
+            cursor: ew-resize;
+        }
+
+        .area {
+            background-color: #e0e0e0;
+            position: absolute;
+            overflow: hidden;
+        }
+
+        .context-menu {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            display: none;
+            z-index: 100;
+        }
+
+        .context-menu li {
+            list-style: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .context-menu li:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<!-- <div id="spinnerContainer">
+    To show context menu for split use right mouse button with Ctrl 
+    <label for="spinner">Split:</label>
+    <input type="number" id="spinner" min="2" max="10" value="2">
+</div> -->
+<div id="placeHolder" style = 'position: relative; width: 800px; height: 600px; left:50px; top:50px'>
+    <div id="workArea"    style = 'position: absolute; width: 100%; height: 100%;'"></div>
+</div>
+
+
+
+<!-- <ul id="contextMenu" class="context-menu">
+    <li id="splitHorizontal">Разделить горизонтально</li>
+    <li id="splitVertical">Разделить вертикально</li>
+</ul> -->
+
+<script src="contextmenu.js"></script>
+<script src="script.js"></script>
+
+
+</body>
+</html>
