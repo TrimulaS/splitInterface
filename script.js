@@ -46,14 +46,16 @@ document.addEventListener('DOMContentLoaded', () => {
     contextMenu.append(spinnerContainer, splitHorizontal, splitVertical, separator, deleteArea);
 
     let propertiesMenu = [
-        { id: 'leftPlus', text: 'Left +10', prop: 'left', delta: 10 },
-        { id: 'leftMinus', text: 'Left -10', prop: 'left', delta: -10 },
-        { id: 'topPlus', text: 'Top +10', prop: 'top', delta: 10 },
-        { id: 'topMinus', text: 'Top -10', prop: 'top', delta: -10 },
-        { id: 'widthPlus', text: 'Width +10', prop: 'width', delta: 10 },
-        { id: 'widthMinus', text: 'Width -10', prop: 'width', delta: -10 },
-        { id: 'heightPlus', text: 'Height +10', prop: 'height', delta: 10 },
+        { id: 'leftPlus',    text: 'Left +10', prop: 'left', delta: 10 },
+        { id: 'leftMinus',   text: 'Left -10', prop: 'left', delta: -10 },
+        { id: 'topPlus' ,    text: 'Top +10', prop: 'top', delta: 10 },
+        { id: 'topMinus',    text: 'Top -10', prop: 'top', delta: -10 },
+        { id: 'widthPlus' ,  text: 'Width +10', prop: 'width', delta: 10 },
+        { id: 'widthMinus',  text: 'Width -10', prop: 'width', delta: -10 },
+        { id: 'heightPlus' , text: 'Height +10', prop: 'height', delta: 10 },
         { id: 'heightMinus', text: 'Height -10', prop: 'height', delta: -10 },
+        { id: 'xPlus',       text: 'Z + 1', prop: 'z-index', delta: 1 },
+        { id: 'xMinus',      text: 'Z - 1', prop: 'z-index', delta: -1 },
     ];
     
     propertiesMenu.forEach(item => {
@@ -69,9 +71,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
+
     
     
     document.body.appendChild(contextMenu);
+
+
+
+
     
     document.getElementById('splitHorizontal').addEventListener('click', () => {
         const targetDiv = contextMenu.relatedDiv;
@@ -165,6 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция разделения div
     function splitDiv(targetDiv, direction) {
+        const splitterSize = 10;    //10 pixels width or height of splitters
+
         const rect = targetDiv.getBoundingClientRect();
         const totalSize = direction === 'horizontal' ? rect.width : rect.height;
         const availableSize = totalSize - (splitCoefficient - 1) * 5; // Учитываем размеры splitters
@@ -176,23 +185,37 @@ document.addEventListener('DOMContentLoaded', () => {
         // Создаем рабочие области и сплиттеры
         for (let i = 0; i < splitCoefficient; i++) {
             const area = document.createElement('div');
-            area.style.position = 'absolute';
+            // area.style.position = 'absolute';
             area.classList.add('area');
             area.id = targetDiv.id + '_area';
             area.style.backgroundColor = 'rgba(' + (255 * Math.random()) + ',' +  (255 * Math.random()) + ',' +  (255 * Math.random()) + ', 0.5)'; 
             console.log(`Created: ${area.id}`);
             targetDiv.appendChild(area);
 
+            // display: flex;
+            // flex-direction: row;
+
             if (direction === 'horizontal') {
+                targetDiv.style.display = 'flex';
+                targetDiv.style.flexDirection = 'row'
                 
-                area.style.width = `${areaSize}px`;
-                area.style.height = `100%`;
-                area.style.left = `${i * (areaSize + 5)}px`;
-                area.style.top = '0';
+                area.style.flexGrow = 1;
+                //area.style.alignItems = 'stretch';
+
+                // area.style.width = `${areaSize}px`;
+                // area.style.height = `100%`;
+                // area.style.left = `${i * (areaSize + 5)}px`;
+                // area.style.top = '0';
+
             } else {
-                area.style.width = `100%`;
-                area.style.height = `${areaSize}px`;
-                area.style.top = `${i * (areaSize + 5)}px`;
+                targetDiv.style.display = 'flex';
+                targetDiv.style.flexDirection = 'column'
+                
+                area.style.flexGrow = 1;
+
+                // area.style.width = `100%`;
+                // area.style.height = `${areaSize}px`;
+                // area.style.top = `${i * (areaSize + 5)}px`;
                 area.style.left = '0';
             }
 
@@ -201,10 +224,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 showContextMenu(e);
             });
 
-            // Добавляем сплиттеры между рабочими областями
+            // Добавляем сплиттеры между рабочими областями 1 less of Areas
             if (i < splitCoefficient - 1) {
                 const splitter = document.createElement('div');
-                area.style.position = 'absolute';
+                // area.style.position = 'absolute';
                 splitter.classList.add('splitter');
                 splitter.classList.add(direction === 'horizontal' ? 'horizontal-splitter' : 'vertical-splitter');
                 splitter.id = targetDiv.id + '_splitter-' + direction + '';
@@ -212,13 +235,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 console.log(`Created: ${splitter.id}`);
                 if (direction === 'horizontal') {
-                    splitter.style.left = `${(i + 1) * areaSize + i * 5}px`;
-                    splitter.style.top = '0';
-                    splitter.style.height = '100%';
+                    // splitter.style.left = `${(i + 1) * areaSize + i * splitter.style.width}px`;
+                    // splitter.style.top = '0';
+                    splitter.style.width = splitterSize + 'px';
+                    // splitter.style.height = '100%';
+
                 } else {
-                    splitter.style.top = `${(i + 1) * areaSize + i * 5}px`;
-                    splitter.style.left = '0';
-                    splitter.style.width = '100%';
+                    // splitter.style.top = `${(i + 1) * areaSize + i * splitter.style.height}px`;
+                    // splitter.style.left = '0';
+                    splitter.style.height = splitterSize + 'px';
+                    // splitter.style.width = '100%';
                 }
 
                 splitters.push(splitter);
@@ -232,13 +258,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     //-----------------------------------------------------------------------------------------resizing
+
     function makeResizableDiv(splitter) {
         const element = splitter.previousElementSibling; //document.querySelector(div);
         const element2 = splitter.nextElementSibling;;
 
 
     
-        const minimum_size = 20;                    //?????????????????????????????????????
+        const minimum_size = 20;                    //Minimal size to stop resize
         let original_width = 0;
         let original_height = 0;
         let original_x = 0;
@@ -283,14 +310,24 @@ document.addEventListener('DOMContentLoaded', () => {
     
         //'horizontal-splitter' : 'vertical-splitter');
         function resize(e) {
-            if (splitter.classList.contains('horizontal-splitter')) {                     //bottom-right
-                const width = original_width + (e.pageX - original_mouse_x);
-                const width2 = original_width2 - (e.pageX - original_mouse_x);
+            const parent = splitter.parentElement;
+            if (splitter.classList.contains('horizontal-splitter')) {   
+                const deltaX = e.pageX - original_mouse_x;                  //bottom-right
+                const width = original_width + deltaX;
+                const width2 = original_width2 - deltaX;
+
+                const rect = parent.getBoundingClientRect();
+                const localX = event.clientX - rect.left; // Координаты мыши по X в пределах div
+                const localY = event.clientY - rect.top;  // Координаты мыши по Y в пределах div
+                console.log('Локальные координаты мыши:', localX, localY, '           Координаты div:', rect.left, rect.top);
+
+
                 if (width > minimum_size && width2 > minimum_size) {
                 element.style.width = width + 'px'
                 element2.style.width = width2 + 'px'
                 element2.style.left = original_x2 + (e.pageX - original_mouse_x) + 'px'
                 splitter.style.left = original_xS + (e.pageX - original_mouse_x) + 'px'
+                console.log
                 }
         
             }
