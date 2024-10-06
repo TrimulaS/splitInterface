@@ -33,40 +33,27 @@
             display: flex;
             background-color: aqua;
             border-style: solid;
-
-
-            /* flex: 1;
-            background-color: #f0f0f0;
-            position: relative;
-            width:800px;
-            height:600px; */
         }
 
         .area {
             display: flex;
-            flex-grow: 1;
-            /* flex-direction: row; */
-            /* background-color: #e0e0e0; */
-            /* position: absolute; */
+            flex-grow: 0;
+            position: relative      /* if some further ajustment left,top width.. expected */
+            /* z-index: 0; */
             /* overflow: hidden; */
         }
 
         .splitter {
-            /* background-color: #999; */
-            /* position: absolute; */
-            z-index: 10;
-            /* cursor: ew-resize; */
+            flex-grow: 0;
+            /* z-index: 10; */
+            position: relative      /* if some further ajustment left,top width.. expected */
         }
 
         .vertical-splitter {
-            width: 100%;
-            height: 5px;
             cursor: ns-resize;
         }
 
         .horizontal-splitter {
-            width: 5px;
-            height: 100%;
             cursor: ew-resize;
         }
 
