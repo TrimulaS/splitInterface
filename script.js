@@ -120,16 +120,16 @@ function addNestedSplit(component){
         // let original_yS = 0;
 
 
-        // let original_mouse_x = 0;
-        // let original_mouse_y = 0;
+        let mouse_x_start = 0;
+        let mouse_y_start = 0;
 
         let parentRect = null;
         let splitterRect = null;
         let rectPrev = null;
         let rectNex = null;
 
-        let availableWidth = null;
-        let availableHeight = null; 
+        let availableWidth = 0;
+        let availableHeight = 0; 
 
 
         splitter.addEventListener('mousedown', function(e) {
@@ -149,8 +149,8 @@ function addNestedSplit(component){
             // original_yS = splitter.getBoundingClientRect().top;
 
 
-            // original_mouse_x = e.pageX;
-            // original_mouse_y = e.pageY;
+            mouse_x_start = e.pageX;
+            mouse_y_start = e.pageY;
 
             
             //Freeze all element and parent during splitter move:
@@ -177,12 +177,8 @@ function addNestedSplit(component){
             availableWidth = rectPrev.width + rectNex.width;      // - splitter.width;
             availableHeight = rectPrev.height + rectNex.height;     // - splitter.width;
 
-
-
-
             window.addEventListener('mousemove', resize)
             window.addEventListener('mouseup', stopResize)
-        
         });
         
 
@@ -190,47 +186,26 @@ function addNestedSplit(component){
         function resize(e) {
 
             if (parent.style.flexDirection === 'row') {   
+                mouse_x = e.pageX;
 
-                // Получаем текущие координаты мыши и ширину родителя
-                const newLeft = e.clientX - parentRect.left;
+                const  deltaX = mouse_x_start - mouse_x;
+                const prevNewWidth = rectPrev.width - deltaX;
 
-                // Local coordinates withi splitter
-                const rect = splitter.getBoundingClientRect();
-                const localX = e.clientX - rect.left; // Координаты мыши по X в пределах div
-                const localY = e.clientY - rect.top;  // Координаты мыши по Y в пределах div
-                console.log(`x ${localX}  y ${localY}`)
-
-
-
-                // Устанавливаем ширину первого блока с учетом ширины splitter
-                // const leftFlex = ((newLeft - splitterMouseLeft) / parentWidth) * 100;
-                const leftFlex = ((newLeft - splitterSize / 2) / availableWidth) * 100;
-
-                if(leftFlex > minimum_size && leftFlex <100 - minimum_size){
-                    areaPrev.style.flex = `0 0 ${leftFlex}%`;
+                if(prevNewWidth > minimum_size && prevNewWidth < availableWidth - minimum_size){
+                    areaPrev.style.flex = `0 0 ${prevNewWidth}px`;
                     areaNext.style.flex = `1 1 auto`;
-                }
-
-
-        
+                }        
             }
             else if (parent.style.flexDirection === 'column') {
+                mouse_y = e.pageY;
 
+                const  deltaY = mouse_y_start - mouse_y;
+                const prevNewHeight = rectPrev.height - deltaY;
 
-                // Получаем текущие координаты мыши и ширину родителя
-                const newTop = e.clientY - parentRect.top;
-                const parentHeight = parentRect.height;
-
-                //Calculate local coordonates mouse on splitter:
-                // const splitterMouseTop = e.clientY - splitterRect.top;
-                // console.log('mouse local y : ' + splitterMouseTop);
-
-                // Устанавливаем ширину первого блока с учетом ширины splitter
-                const topFlex = ((newTop - splitterSize / 2) / parentHeight) * 100;
-                if(topFlex > minimum_size && topFlex <100 - minimum_size){
-                    areaPrev.style.flex = `0 0 ${topFlex}%`;
-                    areaNext.style.flexGrow = 1;
-                }
+                if(prevNewHeight > minimum_size && prevNewHeight < availableHeight - minimum_size){
+                    areaPrev.style.flex = `0 0 ${prevNewHeight}px`;
+                    areaNext.style.flex = `1 1 auto`;
+                }        
         
             }
         
@@ -263,17 +238,20 @@ function addNestedSplit(component){
             //     areaNext.style.flexGrow = '0';
             // }
 
-            //Unfreeze all element and parent during splitter move:
-            Array.from(parent.children).forEach(child => {
-                if(child.classList.contains('area')){
-                    child.style.flex = `1 1 auto`;
-                    // console.log(`un- fixed: ${child.id}  fles: ${child.style.flex} w: ${rect.width} h: ${rect.height}`);
+            // //Unfreeze elements where size was not changed and parent during splitter move:
+            // Array.from(parent.children).forEach(child => {
+            //     if(child.classList.contains('area') && child !== areaPrev && child !== areaNext  ){  //&& child !== areaNext
+            //         child.style.flexGrow = 1;
+            //         child.style.flexShrink = 1;
+            //         // console.log(`un- fixed: ${child.id}  fles: ${child.style.flex} w: ${rect.width} h: ${rect.height}`);
                     
-                }
-            });
+            //     }
+            // });
 
+            
 
             window.removeEventListener('mousemove', resize)
+            window.removeEventListener('mouseup', stopResize)
         }
 
     }
