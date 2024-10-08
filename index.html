@@ -30,6 +30,7 @@
         }
 
         #workArea {
+            position: relative;
             display: flex;
             background-color: aqua;
             border-style: solid;
@@ -37,16 +38,17 @@
 
         .area {
             display: flex;
-            flex-grow: 0;
-            position: relative      /* if some further ajustment left,top width.. expected */
+            /* flex-grow: 0; */
+            /* position: relative      if some further ajustment left,top width.. expected */
             /* z-index: 0; */
             /* overflow: hidden; */
         }
 
         .splitter {
-            flex-grow: 0;
+            background-color: rgb(42, 214, 252);
+            /* flex-grow: 0; */
             /* z-index: 10; */
-            position: relative      /* if some further ajustment left,top width.. expected */
+            /* position: relative      if some further ajustment left,top width.. expected */
         }
 
         .vertical-splitter {
@@ -105,6 +107,12 @@
 
 <!-- <script src="contextmenu.js"></script> -->
 <script src="script.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const workArea = document.getElementById('workArea');
+        addNestedSplit(workArea);    //"<b>bold</b> not bold"
+    });
+</script>
 
 
 </body>
