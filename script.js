@@ -429,64 +429,161 @@ function addNestedSplit(component){
 
 //---------------------------------------------------------------------Resizer for whole Container
 // Adds resize control to bootom right
-function divResizeHV(component){
+// function divResizeHV(component){
 
-    const style = document.createElement('style');
-    style.textContent = `
-        /* Resize button */
-        .corner-for-resize {
-            width: 10px;
-            height: 10px;
-            background-color: black;
-            border-style: solid ;
-            position: absolute;
+//     const style = document.createElement('style');
+//     style.textContent = `
+//         /* Resize button */
+//         .corner-for-resize {
+//             width: 10px;
+//             height: 10px;
+//             background-color: black;
+//             border-style: solid ;
+//             position: absolute;
 
 
-            right: 0;
-            bottom: -10px; /* Сдвигаем на 10px вниз за пределы workArea */
-            /* right: -10px; */
-            cursor: se-resize;
-            z-index: 10;
-        }
-    `;
-document.head.appendChild(style);
-    // add resize control at bottom right
-    const bottomRight = document.createElement('div');
-    bottomRight.classList.add('corner-for-resize');
-    component.appendChild(bottomRight);
+//             right: 0;
+//             bottom: -10px; /* Сдвигаем на 10px вниз за пределы workArea */
+//             /* right: -10px; */
+//             cursor: se-resize;
+//             z-index: 10;
+//         }
+//     `;
+//     document.head.appendChild(style);
+//     // add resize control at bottom right
+//     const bottomRight = document.createElement('div');
+//     bottomRight.classList.add('corner-for-resize');
+//     component.appendChild(bottomRight);
    
-    bottomRight.addEventListener('mousedown', startResizing);
+//     bottomRight.addEventListener('mousedown', startResizing);
    
-    function startResizing(e) {
-        const component = e.target.parentElement;
-        let startWidth = component.offsetWidth;
-        let startHeight = component.offsetHeight;
-        let startX = e.clientX;
-        let startY = e.clientY;
-   
-   
-        function onMouseMove(event) {
+//     function startResizing(e) {
+//         const component = e.target.parentElement;
+//         let startWidth = component.offsetWidth;
+//         let startHeight = component.offsetHeight;
+//         let startX = e.clientX;
+//         let startY = e.clientY;
    
    
-            let newWidth =  startWidth + event.clientX - startX ;  //startWidth/2 + (event.clientX - startX); // ( startWidth + event.clientX - startX );  //startWidth/2 + (event.clientX - startX);  // Here / 2 due to auto center positioning
-            let newHeight = startHeight + (event.clientY - startY);
+//         function onMouseMove(event) {
    
-            if(newWidth >  160) component.style.width =  `${newWidth}px` ;    //`${newWidth * 2 }px`; //`${newWidth }px`;    //`${newWidth * 2 }px`;           // Here * 2 due to auto center positioning 
-            if(newHeight > 100) component.style.height = `${newHeight}px`;
+   
+//             let newWidth =  startWidth + event.clientX - startX ;  //startWidth/2 + (event.clientX - startX); // ( startWidth + event.clientX - startX );  //startWidth/2 + (event.clientX - startX);  // Here / 2 due to auto center positioning
+//             let newHeight = startHeight + (event.clientY - startY);
+   
+//             if(newWidth >  160) component.style.width =  `${newWidth}px` ;    //`${newWidth * 2 }px`; //`${newWidth }px`;    //`${newWidth * 2 }px`;           // Here * 2 due to auto center positioning 
+//             if(newHeight > 100) component.style.height = `${newHeight}px`;
    
             
-        }
+//         }
    
-        document.addEventListener('mousemove', onMouseMove);
+//         document.addEventListener('mousemove', onMouseMove);
    
-        document.addEventListener('mouseup', function mouseUpHandler() {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', mouseUpHandler);
+//         document.addEventListener('mouseup', function mouseUpHandler() {
+//             document.removeEventListener('mousemove', onMouseMove);
+//             document.removeEventListener('mouseup', mouseUpHandler);
+//         });
+//     }
+   
+//    }
+   
+// function makeResizableParentDiv(parentDiv, areaMinimumSize) {
+function divResizeHV(parentDiv, areaMinimumSize = 10){    
+    const splitterClass = 'splitter';
+    const areaClass = 'area';
+    const dragHandleSize = 10; // Размер поля для drag внизу справа
+
+    // Создаем drag-элемент в нижней правой части parentDiv
+    const dragHandle = document.createElement('div');
+    dragHandle.style.position = 'absolute';
+    dragHandle.style.right = '0';
+    dragHandle.style.bottom = '0';
+    dragHandle.style.width = `${dragHandleSize}px`;
+    dragHandle.style.height = `${dragHandleSize}px`;
+    dragHandle.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    dragHandle.style.cursor = 'se-resize'; // Указатель для drag
+    parentDiv.appendChild(dragHandle);
+
+    let originalWidth, originalHeight, originalMouseX, originalMouseY;
+    let areas = Array.from(parentDiv.getElementsByClassName(areaClass));
+    let originalAreaSizes = [];
+    let resizing = false;
+
+    // Функция для начала перетаскивания
+    dragHandle.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        resizing = true;
+
+        originalWidth = parentDiv.getBoundingClientRect().width;
+        originalHeight = parentDiv.getBoundingClientRect().height;
+        originalMouseX = e.pageX;
+        originalMouseY = e.pageY;
+
+        // Сохраняем оригинальные размеры всех areas
+        areas.forEach(area => {
+            const rect = area.getBoundingClientRect();
+            originalAreaSizes.push({ width: rect.width, height: rect.height });
         });
+
+        window.addEventListener('mousemove', resize);
+        window.addEventListener('mouseup', stopResize);
+    });
+
+    function resize(e) {
+        if (!resizing) return;
+
+        const deltaX = e.pageX - originalMouseX;
+        const deltaY = e.pageY - originalMouseY;
+
+        let newWidth = originalWidth + deltaX;
+        let newHeight = originalHeight + deltaY;
+
+        // Ограничиваем размеры parentDiv по минимальным и максимальным значениям
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        if (newWidth > windowWidth) newWidth = windowWidth;
+        if (newHeight > windowHeight) newHeight = windowHeight;
+
+        // Изменяем размер parentDiv
+        parentDiv.style.width = `${newWidth}px`;
+        parentDiv.style.height = `${newHeight}px`;
+
+        // Пропорционально изменяем размеры всех area элементов
+        const widthRatio = newWidth / originalWidth;
+        const heightRatio = newHeight / originalHeight;
+
+        areas.forEach((area, index) => {
+            const originalSize = originalAreaSizes[index];
+            let newAreaWidth = originalSize.width * widthRatio;
+            let newAreaHeight = originalSize.height * heightRatio;
+
+            // Проверка минимальных размеров
+            if (newAreaWidth < areaMinimumSize) newAreaWidth = areaMinimumSize;
+            if (newAreaHeight < areaMinimumSize) newAreaHeight = areaMinimumSize;
+
+            // Устанавливаем новые размеры для каждой области
+            area.style.width = `${newAreaWidth}px`;
+            area.style.height = `${newAreaHeight}px`;
+        });
+
+        // Проверка на минимальные размеры
+        if (newWidth <= areaMinimumSize || newHeight <= areaMinimumSize) {
+            stopResize();
+        }
     }
-   
-   }
-   
+
+    function stopResize() {
+        resizing = false;
+        window.removeEventListener('mousemove', resize);
+        window.removeEventListener('mouseup', stopResize);
+    }
+}
+
+// // Пример использования:
+// const parentDiv = document.getElementById('parentDiv');
+// const areaMinimumSize = 50; // Минимальный размер для вложенных элементов
+// makeResizableParentDiv(parentDiv, areaMinimumSize);
 
 
 
